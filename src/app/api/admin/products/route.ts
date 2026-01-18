@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 // GET all products with filters
@@ -19,46 +19,49 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') || ''
     const status = searchParams.get('status') || ''
 
-    let query = supabase
-        .from('products')
-        .select(`
-      *,
-      category:categories(id, name, slug),
-      images:product_images(id, image_url, is_primary, sort_order),
-      variants:product_variants(id, size, color, color_hex, stock_quantity, sku, is_active)
-    `, { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .range((page - 1) * limit, page * limit - 1)
+    try {
+        let query: FirebaseFirestore.Query = adminDb.collection('products')
 
-    if (search) {
-        query = query.ilike('name', `%${search}%`)
-    }
-
-    if (category) {
-        query = query.eq('category_id', category)
-    }
-
-    if (status === 'active') {
-        query = query.eq('is_active', true)
-    } else if (status === 'hidden') {
-        query = query.eq('is_active', false)
-    }
-
-    const { data: products, error, count } = await query
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({
-        products,
-        pagination: {
-            page,
-            limit,
-            total: count || 0,
-            totalPages: Math.ceil((count || 0) / limit)
+        if (status === 'active') {
+            query = query.where('is_active', '==', true)
+        } else if (status === 'hidden') {
+            query = query.where('is_active', '==', false)
         }
-    })
+
+        if (category) {
+            query = query.where('category_id', '==', category)
+        }
+
+        // Firestore cursor-based pagination is ideal, but we'll use offset for now (inefficient for large datasets but works for admin)
+        // Note: Firestore doesn't support offset well. We usually fetch all and slice, or use startAfter.
+        // For simple admin dashboard, let's fetch matching docs.
+
+        let snapshot = await query.orderBy('created_at', 'desc').get();
+        let products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+
+        // Filter by search term in memory (Firestore lacks full-text search)
+        if (search) {
+            const lowerSearch = search.toLowerCase();
+            products = products.filter(p => p.name.toLowerCase().includes(lowerSearch));
+        }
+
+        const total = products.length;
+        const totalPages = Math.ceil(total / limit);
+        const paginatedProducts = products.slice((page - 1) * limit, page * limit);
+
+        return NextResponse.json({
+            products: paginatedProducts,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages
+            }
+        })
+    } catch (err: any) {
+        console.error('Fetch products error:', err)
+        return NextResponse.json({ error: err.message }, { status: 500 })
+    }
 }
 
 // CREATE new product
@@ -82,67 +85,52 @@ export async function POST(request: NextRequest) {
         // Generate slug
         const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now()
 
-        // Insert product
-        const { data: product, error: productError } = await supabase
-            .from('products')
-            .insert({
-                name,
-                slug,
-                description,
-                price: parseFloat(price),
-                compare_price: compare_price ? parseFloat(compare_price) : null,
-                category_id: category_id || null,
-                gender: gender || null,
-                is_active: is_active ?? true,
-                is_featured: is_featured ?? false
-            })
-            .select()
-            .single()
+        // Prepare data
+        const productData = {
+            name,
+            slug,
+            description,
+            price: parseFloat(price),
+            compare_price: compare_price ? parseFloat(compare_price) : null,
+            category_id: category_id || null,
+            gender: gender || null,
+            is_active: is_active ?? true,
+            is_featured: is_featured ?? false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
 
-        if (productError) {
-            return NextResponse.json({ error: productError.message }, { status: 500 })
-        }
-
-        // Insert images
-        if (images && images.length > 0) {
-            const imageRecords = images.map((img: { url: string; alt?: string }, index: number) => ({
-                product_id: product.id,
+            // Embed images directly
+            images: images && images.length > 0 ? images.map((img: { url: string; alt?: string }, index: number) => ({
+                id: `img-${Date.now()}-${index}`,
                 image_url: img.url,
                 alt_text: img.alt || name,
                 is_primary: index === 0,
                 sort_order: index
-            }))
+            })) : [],
 
-            await supabase.from('product_images').insert(imageRecords)
-        }
-
-        // Insert variants
-        if (variants && variants.length > 0) {
-            const variantRecords = variants.map((v: { size: string; color: string; color_hex?: string; stock: number; sku?: string }) => ({
-                product_id: product.id,
+            // Embed variants directly
+            variants: variants && variants.length > 0 ? variants.map((v: { size: string; color: string; color_hex?: string; stock: number; sku?: string }, index: number) => ({
+                id: `var-${Date.now()}-${index}`,
                 size: v.size,
                 color: v.color,
                 color_hex: v.color_hex || null,
                 stock_quantity: v.stock || 0,
-                sku: v.sku || `${slug}-${v.size}-${v.color}`.toUpperCase()
-            }))
+                sku: v.sku || `${slug}-${v.size}-${v.color}`.toUpperCase(),
+                is_active: true
+            })) : [],
 
-            await supabase.from('product_variants').insert(variantRecords)
+            // Store collection IDs as array
+            collections: collections || []
         }
 
-        // Link to collections
-        if (collections && collections.length > 0) {
-            const collectionLinks = collections.map((collectionId: string) => ({
-                product_id: product.id,
-                collection_id: collectionId
-            }))
+        const docRef = await adminDb.collection('products').add(productData);
 
-            await supabase.from('product_collections').insert(collectionLinks)
-        }
-
-        return NextResponse.json({ success: true, product })
-    } catch (err) {
+        return NextResponse.json({
+            success: true,
+            product: { id: docRef.id, ...productData }
+        })
+    } catch (err: any) {
         console.error('Create product error:', err)
-        return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to create product: ' + err.message }, { status: 500 })
     }
 }

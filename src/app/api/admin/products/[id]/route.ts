@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 interface RouteParams {
@@ -18,22 +18,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: product, error } = await supabase
-        .from('products')
-        .select(`
-      *,
-      category:categories(id, name, slug),
-      images:product_images(id, image_url, is_primary, sort_order),
-      variants:product_variants(id, size, color, color_hex, stock_quantity, sku, is_active, price_adjustment)
-    `)
-        .eq('id', id)
-        .single()
+    try {
+        const docRef = adminDb.collection('products').doc(id);
+        const docSnap = await docRef.get();
 
-    if (error) {
-        return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+        if (!docSnap.exists) {
+            return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+        }
+
+        const product = { id: docSnap.id, ...docSnap.data() };
+
+        return NextResponse.json({ product })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ product })
 }
 
 // UPDATE product
@@ -50,68 +48,55 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     try {
         const body = await request.json()
-        const { name, description, price, compare_price, category_id, gender, is_active, is_featured, images, variants } = body
+        const { name, description, price, compare_price, category_id, gender, is_active, is_featured, images, variants, collections } = body
 
-        // Update product
-        const { error: productError } = await supabase
-            .from('products')
-            .update({
-                name,
-                description,
-                price: parseFloat(price),
-                compare_price: compare_price ? parseFloat(compare_price) : null,
-                category_id: category_id || null,
-                gender: gender || null,
-                is_active,
-                is_featured
-            })
-            .eq('id', id)
-
-        if (productError) {
-            return NextResponse.json({ error: productError.message }, { status: 500 })
+        const updateData: any = {
+            name,
+            description,
+            price: parseFloat(price),
+            compare_price: compare_price ? parseFloat(compare_price) : null,
+            category_id: category_id || null,
+            gender: gender || null,
+            is_active,
+            is_featured,
+            updated_at: new Date().toISOString()
         }
 
-        // Update images if provided
+        // Update images if provided (replace entire array)
         if (images) {
-            // Delete existing images
-            await supabase.from('product_images').delete().eq('product_id', id)
-
-            // Insert new images
-            if (images.length > 0) {
-                const imageRecords = images.map((img: { url: string; alt?: string }, index: number) => ({
-                    product_id: id,
-                    image_url: img.url,
-                    alt_text: img.alt || name,
-                    is_primary: index === 0,
-                    sort_order: index
-                }))
-                await supabase.from('product_images').insert(imageRecords)
-            }
+            updateData.images = images.length > 0 ? images.map((img: { url: string; alt?: string }, index: number) => ({
+                id: `img-${Date.now()}-${index}`,
+                image_url: img.url,
+                alt_text: img.alt || name,
+                is_primary: index === 0,
+                sort_order: index
+            })) : [];
         }
 
-        // Update variants if provided
+        // Update variants if provided (replace entire array)
         if (variants) {
-            // Delete existing variants
-            await supabase.from('product_variants').delete().eq('product_id', id)
-
-            // Insert new variants
-            if (variants.length > 0) {
-                const variantRecords = variants.map((v: { size: string; color: string; color_hex?: string; stock: number; sku?: string }) => ({
-                    product_id: id,
-                    size: v.size,
-                    color: v.color,
-                    color_hex: v.color_hex || null,
-                    stock_quantity: v.stock || 0,
-                    sku: v.sku
-                }))
-                await supabase.from('product_variants').insert(variantRecords)
-            }
+            updateData.variants = variants.length > 0 ? variants.map((v: { size: string; color: string; color_hex?: string; stock: number; sku?: string }, index: number) => ({
+                id: `var-${Date.now()}-${index}`,
+                size: v.size,
+                color: v.color,
+                color_hex: v.color_hex || null,
+                stock_quantity: v.stock || 0,
+                sku: v.sku, // Keep existing SKU if provided, or could generate new
+                is_active: true
+            })) : [];
         }
+
+        // Update collections if provided
+        if (collections) {
+            updateData.collections = collections;
+        }
+
+        await adminDb.collection('products').doc(id).update(updateData);
 
         return NextResponse.json({ success: true })
-    } catch (err) {
+    } catch (err: any) {
         console.error('Update product error:', err)
-        return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to update product: ' + err.message }, { status: 500 })
     }
 }
 
@@ -127,14 +112,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', id)
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+    try {
+        await adminDb.collection('products').doc(id).delete();
+        return NextResponse.json({ success: true })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ success: true })
 }

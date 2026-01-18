@@ -1,23 +1,32 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './page.module.css'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
+import { Product } from '@/lib/types'
 import ProductCard from '@/components/ProductCard'
 import { ArrowRight, Truck, Shield, RotateCcw } from 'lucide-react'
 
 export const revalidate = 0
 
 export default async function Home() {
-  const { data: products } = await supabase
-    .from('products')
-    .select(`
-      *,
-      category:categories(name),
-      images:product_images(image_url, is_primary)
-    `)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
+  const productsSnapshot = await adminDb.collection('products')
+    .where('is_active', '==', true)
+    .orderBy('created_at', 'desc')
     .limit(8)
+    .get();
+
+  const products = productsSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      // Map Firestore data to Product type if needed, or rely on it matching.
+      // We might need to fetch images separately if they are in a subcollection,
+      // but usually they are an array on the product doc in NoSQL.
+      // Assuming 'images' and 'category' are stored on the doc or need manual fetch.
+      // For now, let's assume flat structure or adjust as we go.
+    } as Product
+  });
 
   return (
     <main className={styles.main}>
