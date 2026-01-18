@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -22,4 +22,4 @@ const storage = getStorage(app);
 // Set language to user's browser preference
 auth.languageCode = 'en';
 
-export { app, auth, db, storage, RecaptchaVerifier, signInWithPhoneNumber };
+export { app, auth, db, storage, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential };
