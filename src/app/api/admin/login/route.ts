@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { signToken } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
@@ -12,16 +12,18 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch admin by email
-        const { data: admin, error } = await supabase
-            .from('admins')
-            .select('*')
-            .eq('email', email.toLowerCase())
-            .single()
+        const snapshot = await adminDb.collection('admins')
+            .where('email', '==', email.toLowerCase())
+            .limit(1)
+            .get();
 
-        if (error || !admin) {
-            console.error('Admin Login Failed: User not found or DB error.', error)
+        if (snapshot.empty) {
+            console.error('Admin Login Failed: User not found in Firestore')
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
         }
+
+        const adminDoc = snapshot.docs[0];
+        const admin = adminDoc.data();
 
         // Verify password
         const isValidPassword = await bcrypt.compare(password, admin.password_hash)
@@ -32,14 +34,11 @@ export async function POST(request: NextRequest) {
         }
 
         // Update last login
-        await supabase
-            .from('admins')
-            .update({ last_login: new Date().toISOString() })
-            .eq('id', admin.id)
+        await adminDoc.ref.update({ last_login: new Date().toISOString() })
 
         // Generate JWT token
         const token = signToken({
-            id: admin.id,
+            id: adminDoc.id,
             email: admin.email,
             role: admin.role,
             type: 'admin'
@@ -49,7 +48,7 @@ export async function POST(request: NextRequest) {
         const response = NextResponse.json({
             success: true,
             admin: {
-                id: admin.id,
+                id: adminDoc.id,
                 email: admin.email,
                 name: admin.name,
                 role: admin.role,

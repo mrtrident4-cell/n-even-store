@@ -1,0 +1,14 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
+.env*.local
+.vercel
+firebase.json
+.firebaserc
+firestore.indexes.json
+firestore.rules
+storage.rules

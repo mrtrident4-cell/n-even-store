@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 interface RouteParams {
@@ -18,21 +18,49 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: order, error } = await supabase
-        .from('orders')
-        .select(`
-      *,
-      customer:customers(id, email, first_name, last_name, phone),
-      items:order_items(id, product_id, variant_id, product_name, product_image, size, color, quantity, unit_price, total_price)
-    `)
-        .eq('id', id)
-        .single()
+    try {
+        const orderDoc = await adminDb.collection('orders').doc(id).get();
 
-    if (error) {
-        return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+        if (!orderDoc.exists) {
+            return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+        }
+
+        const orderData = orderDoc.data()!;
+        let order = { id: orderDoc.id, ...orderData };
+
+        // Fetch customer info if available
+        if (orderData.customer_id) {
+            const customerDoc = await adminDb.collection('customers').doc(orderData.customer_id).get();
+            if (customerDoc.exists) {
+                const cData = customerDoc.data()!;
+                order = {
+                    ...order,
+                    customer: {
+                        id: customerDoc.id,
+                        email: cData.email,
+                        name: cData.name,
+                        phone: cData.phone,
+                        ...cData
+                    }
+                };
+            }
+        }
+
+        // Fetch Items if not embedded (check subcollection 'items')
+        if (!orderData.items || (Array.isArray(orderData.items) && orderData.items.length === 0)) {
+            const itemsSnap = await orderDoc.ref.collection('order_items').get(); // Try subcollection
+            if (!itemsSnap.empty) {
+                order = {
+                    ...order,
+                    items: itemsSnap.docs.map(i => ({ id: i.id, ...i.data() }))
+                };
+            }
+        }
+
+        return NextResponse.json({ order })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ order })
 }
 
 // UPDATE order status
@@ -47,36 +75,33 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { status, payment_status, admin_notes } = await request.json()
+    try {
+        const { status, payment_status, admin_notes } = await request.json()
 
-    const updates: Record<string, unknown> = {}
+        const updates: Record<string, unknown> = {}
 
-    if (status) {
-        updates.status = status
-        if (status === 'shipped') {
-            updates.shipped_at = new Date().toISOString()
+        if (status) {
+            updates.status = status
+            if (status === 'shipped') {
+                updates.shipped_at = new Date().toISOString()
+            }
+            if (status === 'delivered') {
+                updates.delivered_at = new Date().toISOString()
+            }
         }
-        if (status === 'delivered') {
-            updates.delivered_at = new Date().toISOString()
+
+        if (payment_status) {
+            updates.payment_status = payment_status
         }
+
+        if (admin_notes !== undefined) {
+            updates.admin_notes = admin_notes
+        }
+
+        await adminDb.collection('orders').doc(id).update(updates);
+
+        return NextResponse.json({ success: true })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    if (payment_status) {
-        updates.payment_status = payment_status
-    }
-
-    if (admin_notes !== undefined) {
-        updates.admin_notes = admin_notes
-    }
-
-    const { error } = await supabase
-        .from('orders')
-        .update(updates)
-        .eq('id', id)
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true })
 }

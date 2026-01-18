@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 // GET all settings
@@ -12,21 +12,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: settings, error } = await supabase
-        .from('store_settings')
-        .select('*')
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+    try {
+        const docSnap = await adminDb.collection('settings').doc('store').get();
+        const settingsObj = docSnap.exists ? docSnap.data() : {};
+        return NextResponse.json({ settings: settingsObj || {} })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    // Convert to key-value object
-    const settingsObj: Record<string, string> = {}
-    settings?.forEach(s => {
-        settingsObj[s.key] = s.value || ''
-    })
-
-    return NextResponse.json({ settings: settingsObj })
 }
 
 // UPDATE settings
@@ -39,25 +31,22 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if admin has settings permission
-    const { data: admin } = await supabase
-        .from('admins')
-        .select('permissions')
-        .eq('id', payload.id)
-        .single()
+    try {
+        // Check if admin has settings permission
+        const adminDoc = await adminDb.collection('admins').doc(payload.id).get();
+        const admin = adminDoc.data();
 
-    if (!admin?.permissions?.settings) {
-        return NextResponse.json({ error: 'You do not have permission to modify settings' }, { status: 403 })
+        if (!admin?.permissions?.settings) {
+            return NextResponse.json({ error: 'You do not have permission to modify settings' }, { status: 403 })
+        }
+
+        const settings = await request.json()
+
+        // Update settings doc
+        await adminDb.collection('settings').doc('store').set(settings, { merge: true });
+
+        return NextResponse.json({ success: true })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    const settings = await request.json()
-
-    // Update each setting
-    for (const [key, value] of Object.entries(settings)) {
-        await supabase
-            .from('store_settings')
-            .upsert({ key, value: value as string, updated_at: new Date().toISOString() }, { onConflict: 'key' })
-    }
-
-    return NextResponse.json({ success: true })
 }

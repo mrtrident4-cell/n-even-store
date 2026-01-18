@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import jwt from 'jsonwebtoken'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-in-production'
@@ -20,15 +20,14 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Invalid token type' }, { status: 401 })
         }
 
-        const { data: customer, error } = await supabase
-            .from('customers')
-            .select('id, name, phone, email')
-            .eq('id', payload.id)
-            .single()
+        const docRef = adminDb.collection('customers').doc(payload.id);
+        const docSnap = await docRef.get();
 
-        if (error || !customer) {
+        if (!docSnap.exists) {
             return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
         }
+
+        const customer = { id: docSnap.id, ...docSnap.data() };
 
         return NextResponse.json({ customer })
     } catch {

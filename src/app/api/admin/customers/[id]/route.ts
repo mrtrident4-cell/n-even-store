@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 interface RouteParams {
@@ -18,46 +18,53 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get customer
-    const { data: customer, error: customerError } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('id', id)
-        .single()
+    try {
+        const customerDoc = await adminDb.collection('customers').doc(id).get();
 
-    if (customerError) {
-        return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
-    }
-
-    // Get addresses
-    const { data: addresses } = await supabase
-        .from('customer_addresses')
-        .select('*')
-        .eq('customer_id', id)
-
-    // Get order history
-    const { data: orders } = await supabase
-        .from('orders')
-        .select('id, order_number, total_amount, status, payment_status, created_at')
-        .eq('customer_id', id)
-        .order('created_at', { ascending: false })
-        .limit(20)
-
-    // Calculate stats
-    const totalSpent = orders?.reduce((sum, o) => sum + Number(o.total_amount), 0) || 0
-    const totalOrders = orders?.length || 0
-
-    return NextResponse.json({
-        customer: {
-            ...customer,
-            addresses,
-            orders,
-            stats: {
-                totalSpent,
-                totalOrders
-            }
+        if (!customerDoc.exists) {
+            return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
         }
-    })
+
+        const customer = { id: customerDoc.id, ...customerDoc.data() };
+
+        // Get addresses (assuming stored in subcollection 'addresses' or just empty for now)
+        const addressesSnap = await customerDoc.ref.collection('addresses').get();
+        const addresses = addressesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Get order history
+        const ordersSnap = await adminDb.collection('orders')
+            .where('customer_id', '==', id)
+            .orderBy('created_at', 'desc')
+            .limit(20)
+            .get();
+
+        const orders = ordersSnap.docs.map(doc => ({
+            id: doc.id,
+            order_number: doc.data().order_number,
+            total_amount: doc.data().total_amount,
+            status: doc.data().status,
+            payment_status: doc.data().payment_status,
+            created_at: doc.data().created_at
+        }));
+
+        // Calculate stats
+        const totalSpent = orders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+        const totalOrders = orders.length;
+
+        return NextResponse.json({
+            customer: {
+                ...customer,
+                addresses,
+                orders,
+                stats: {
+                    totalSpent,
+                    totalOrders
+                }
+            }
+        })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
+    }
 }
 
 // UPDATE customer (block/unblock)
@@ -72,16 +79,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { is_blocked } = await request.json()
+    try {
+        const { is_blocked } = await request.json()
 
-    const { error } = await supabase
-        .from('customers')
-        .update({ is_blocked })
-        .eq('id', id)
+        await adminDb.collection('customers').doc(id).update({ is_blocked });
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ success: true })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ success: true })
 }

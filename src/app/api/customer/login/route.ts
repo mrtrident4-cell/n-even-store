@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { otpStore } from '@/lib/otpStore'
@@ -24,15 +24,18 @@ export async function POST(request: NextRequest) {
     otpStore.delete(phone)
 
     // Find customer
-    const { data: customer, error } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('phone', phone)
-        .single()
+    // Check if phone exists in Firestore
+    const snapshot = await adminDb.collection('customers')
+        .where('phone', '==', phone)
+        .limit(1)
+        .get();
 
-    if (error || !customer) {
+    if (snapshot.empty) {
         return NextResponse.json({ error: 'Account not found. Please sign up first.' }, { status: 404 })
     }
+
+    const doc = snapshot.docs[0];
+    const customer = { id: doc.id, ...doc.data() } as any;
 
     // Generate JWT token
     const token = jwt.sign(

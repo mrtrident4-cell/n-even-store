@@ -1,33 +1,44 @@
 import styles from './products.module.css'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import ProductCard from '@/components/ProductCard'
 import { Filter, ChevronDown } from 'lucide-react'
+import { Product } from '@/lib/types'
 
 export const revalidate = 0
 
 export default async function ProductsPage({
     searchParams
 }: {
-    searchParams: { category?: string; sort?: string; gender?: string }
+    searchParams: Promise<{ category?: string; sort?: string; gender?: string }>
 }) {
-    let query = supabase
-        .from('products')
-        .select(`
-            *,
-            category:categories(id, name, slug),
-            images:product_images(id, image_url, is_primary, sort_order)
-        `)
-        .eq('is_active', true)
+    const params = await searchParams; // Await params in Next.js 15+
 
-    if (searchParams.category) {
-        query = query.eq('category.slug', searchParams.category)
+    let query: FirebaseFirestore.Query = adminDb.collection('products')
+        .where('is_active', '==', true)
+
+    if (params.gender) {
+        query = query.where('gender', '==', params.gender)
     }
 
-    if (searchParams.gender) {
-        query = query.eq('gender', searchParams.gender)
+    let categoryId = null;
+    if (params.category) {
+        const catSnap = await adminDb.collection('categories')
+            .where('slug', '==', params.category)
+            .limit(1)
+            .get();
+        if (!catSnap.empty) {
+            categoryId = catSnap.docs[0].id;
+            query = query.where('category_id', '==', categoryId);
+        }
     }
 
-    const { data: products, error } = await query.order('created_at', { ascending: false })
+    const snapshot = await query.orderBy('created_at', 'desc').get();
+
+    // Convert to plain object list
+    const products = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    })) as Product[]
 
     return (
         <div className={styles.container}>
@@ -44,8 +55,8 @@ export default async function ProductsPage({
                         <Filter size={18} /> Filters
                     </button>
                     <div className={styles.activeFilters}>
-                        {searchParams.gender && <span className={styles.tag}>Gender: {searchParams.gender}</span>}
-                        {searchParams.category && <span className={styles.tag}>Category: {searchParams.category}</span>}
+                        {params.gender && <span className={styles.tag}>Gender: {params.gender}</span>}
+                        {params.category && <span className={styles.tag}>Category: {params.category}</span>}
                     </div>
                 </div>
 

@@ -1,22 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
-import { adminAuth } from '@/lib/firebaseAdmin'
+import { adminAuth, adminDb } from '@/lib/firebaseAdmin'
 
 // This route creates a new customer after Firebase phone verification
 export async function POST(request: NextRequest) {
     try {
-        // Get the Firebase ID token from the Authorization header
         const authHeader = request.headers.get('Authorization')
         if (!authHeader?.startsWith('Bearer ')) {
             return NextResponse.json({ error: 'Missing authorization' }, { status: 401 })
         }
 
         const idToken = authHeader.split('Bearer ')[1]
-
-        // Verify the Firebase token
-        let decodedToken
         try {
-            decodedToken = await adminAuth.verifyIdToken(idToken)
+            await adminAuth.verifyIdToken(idToken)
         } catch (error) {
             return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
         }
@@ -28,41 +23,30 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if customer already exists
-        const { data: existing } = await supabase
-            .from('customers')
-            .select('id')
-            .eq('firebase_uid', firebaseUid)
-            .single()
+        const snapshot = await adminDb.collection('customers')
+            .where('firebase_uid', '==', firebaseUid)
+            .limit(1)
+            .get();
 
-        if (existing) {
+        if (!snapshot.empty) {
             return NextResponse.json({ error: 'Account already exists' }, { status: 409 })
         }
 
-        // Create new customer
-        const { data: customer, error } = await supabase
-            .from('customers')
-            .insert({
-                phone,
-                name,
-                firebase_uid: firebaseUid,
-                is_active: true
-            })
-            .select()
-            .single()
+        const customerData = {
+            phone,
+            name,
+            firebase_uid: firebaseUid,
+            is_active: true,
+            created_at: new Date().toISOString()
+        };
 
-        if (error) {
-            console.error('Signup error:', error)
-            return NextResponse.json({ error: 'Failed to create account' }, { status: 500 })
-        }
+        const docRef = await adminDb.collection('customers').add(customerData);
 
         return NextResponse.json({
             success: true,
             customer: {
-                id: customer.id,
-                name: customer.name,
-                phone: customer.phone,
-                email: customer.email,
-                firebaseUid: customer.firebase_uid
+                id: docRef.id,
+                ...customerData
             }
         })
     } catch (error: any) {

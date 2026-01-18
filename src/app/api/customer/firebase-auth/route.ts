@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
-import { adminAuth } from '@/lib/firebaseAdmin'
+import { adminAuth, adminDb } from '@/lib/firebaseAdmin'
 
 // This route checks if a Firebase-authenticated user exists in our database
 export async function POST(request: NextRequest) {
@@ -24,22 +23,25 @@ export async function POST(request: NextRequest) {
         const { phone, firebaseUid } = await request.json()
 
         // Check if customer exists in our database
-        const { data: customer, error } = await supabase
-            .from('customers')
-            .select('*')
-            .eq('firebase_uid', firebaseUid)
-            .single()
+        // Query customers where firebase_uid == firebaseUid
+        const snapshot = await adminDb.collection('customers')
+            .where('firebase_uid', '==', firebaseUid)
+            .limit(1)
+            .get();
 
-        if (error || !customer) {
+        if (snapshot.empty) {
             // User doesn't exist, they need to complete signup
             return NextResponse.json({ isNewUser: true })
         }
+
+        const customerDoc = snapshot.docs[0];
+        const customer = customerDoc.data();
 
         // User exists, return their data
         return NextResponse.json({
             success: true,
             customer: {
-                id: customer.id,
+                id: customerDoc.id,
                 name: customer.name,
                 phone: customer.phone,
                 email: customer.email,

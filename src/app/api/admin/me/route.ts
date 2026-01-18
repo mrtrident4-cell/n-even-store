@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
@@ -18,16 +18,24 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch fresh admin data
-    const { data: admin, error } = await supabase
-        .from('admins')
-        .select('id, email, name, role, permissions')
-        .eq('id', payload.id)
-        .single()
+    // In Firestore, get doc by ID (which is in payload.id)
+    const docRef = adminDb.collection('admins').doc(payload.id);
+    const docSnap = await docRef.get();
 
-    if (error || !admin) {
-        console.error('Database lookup failed for admin ID:', payload.id, error)
+    if (!docSnap.exists) {
+        console.error('Database lookup failed for admin ID:', payload.id)
         return NextResponse.json({ authenticated: false, message: 'User record not found' }, { status: 401 })
     }
+
+    const adminData = docSnap.data()!;
+    // Return only safe fields
+    const admin = {
+        id: docSnap.id,
+        email: adminData.email,
+        name: adminData.name,
+        role: adminData.role,
+        permissions: adminData.permissions
+    };
 
     console.log('Admin identified successfully:', admin.email)
 

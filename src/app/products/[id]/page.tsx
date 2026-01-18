@@ -4,7 +4,8 @@ import { useEffect, useState, use } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ShoppingBag, Heart, Share2, Ruler, Shield, Truck } from 'lucide-react'
 import styles from './product.module.css'
-import { supabase } from '@/lib/supabaseClient'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 export default function ProductDetailPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
     const params = use(paramsPromise)
@@ -18,18 +19,21 @@ export default function ProductDetailPage({ params: paramsPromise }: { params: P
     }, [params.id])
 
     async function fetchProduct() {
-        const { data, error } = await supabase
-            .from('products')
-            .select(`
-                *,
-                category:categories(name),
-                images:product_images(*),
-                variants:product_variants(*)
-            `)
-            .eq('id', params.id)
-            .single()
+        if (!params?.id) return
 
-        if (data) setProduct(data)
+        try {
+            const docRef = doc(db, 'products', params.id)
+            const docSnap = await getDoc(docRef)
+
+            if (docSnap.exists()) {
+                const data = { id: docSnap.id, ...docSnap.data() } as any
+                setProduct(data)
+            } else {
+                setProduct(null)
+            }
+        } catch (error) {
+            console.error('Error fetching product:', error)
+        }
         setLoading(false)
     }
 

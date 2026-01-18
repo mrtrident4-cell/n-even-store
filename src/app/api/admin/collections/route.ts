@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { adminDb } from '@/lib/firebaseAdmin'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 // GET all collections
@@ -12,16 +12,17 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: collections, error } = await supabase
-        .from('collections')
-        .select('*')
-        .order('created_at', { ascending: false })
+    try {
+        const snapshot = await adminDb.collection('collections')
+            .orderBy('created_at', 'desc')
+            .get();
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        const collections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        return NextResponse.json({ collections })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ collections })
 }
 
 // CREATE collection
@@ -34,32 +35,32 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { name, description, image_url, start_date, end_date } = await request.json()
+    try {
+        const { name, description, image_url, start_date, end_date } = await request.json()
 
-    if (!name) {
-        return NextResponse.json({ error: 'Name is required' }, { status: 400 })
-    }
+        if (!name) {
+            return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+        }
 
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
-    const { data: collection, error } = await supabase
-        .from('collections')
-        .insert({
+        const collectionData = {
             name,
             slug: slug + '-' + Date.now(),
-            description,
-            image_url,
-            start_date,
-            end_date
-        })
-        .select()
-        .single()
+            description: description || null,
+            image_url: image_url || null,
+            is_active: true,
+            start_date: start_date || null,
+            end_date: end_date || null,
+            created_at: new Date().toISOString()
+        };
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        const docRef = await adminDb.collection('collections').add(collectionData);
+
+        return NextResponse.json({ success: true, collection: { id: docRef.id, ...collectionData } })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ success: true, collection })
 }
 
 // UPDATE collection
@@ -72,29 +73,31 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id, name, description, image_url, is_active, start_date, end_date } = await request.json()
+    try {
+        const { id, name, description, image_url, is_active, start_date, end_date } = await request.json()
 
-    if (!id) {
-        return NextResponse.json({ error: 'Collection ID is required' }, { status: 400 })
-    }
+        if (!id) {
+            return NextResponse.json({ error: 'Collection ID is required' }, { status: 400 })
+        }
 
-    const { error } = await supabase
-        .from('collections')
-        .update({
+        const updateData: any = {
             name,
             description,
             image_url,
             is_active,
             start_date,
             end_date
-        })
-        .eq('id', id)
+        };
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        // Clean undefined
+        Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
+        await adminDb.collection('collections').doc(id).update(updateData);
+
+        return NextResponse.json({ success: true })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ success: true })
 }
 
 // DELETE collection
@@ -114,14 +117,10 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json({ error: 'Collection ID is required' }, { status: 400 })
     }
 
-    const { error } = await supabase
-        .from('collections')
-        .delete()
-        .eq('id', id)
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+    try {
+        await adminDb.collection('collections').doc(id).delete();
+        return NextResponse.json({ success: true })
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    return NextResponse.json({ success: true })
 }
