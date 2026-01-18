@@ -22,4 +22,4 @@ const storage = getStorage(app);
 // Set language to user's browser preference
 auth.languageCode = 'en';
 
-export { app, auth, db, storage, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential };
+export { app, auth, db, storage, RecaptchaVerifier, signInWithPhoneNumber };

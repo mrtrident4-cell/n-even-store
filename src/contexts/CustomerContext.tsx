@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { auth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from '@/lib/firebase'
-import { ConfirmationResult, User } from 'firebase/auth'
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from '@/lib/firebase'
+import { ConfirmationResult, User, PhoneAuthProvider, signInWithCredential } from 'firebase/auth'
 
 interface Customer {
     id: string
