@@ -1,0 +1,23 @@
+.container {
+    padding: 6rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    margin-bottom: 5rem;
+    text-align: center;
+}
+
+.title {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 3rem;
+}

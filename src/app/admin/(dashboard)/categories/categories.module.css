@@ -1,0 +1,267 @@
+.container {
+    max-width: 1200px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 0.5rem;
+}
+
+.subtitle {
+    color: #666;
+    margin: 0;
+}
+
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.addBtn:hover {
+    background: #333;
+}
+
+.loading {
+    padding: 4rem;
+    text-align: center;
+    color: #666;
+}
+
+/* Category Grid */
+.categoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.categoryCard {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e5e5e5;
+    display: flex;
+    gap: 1rem;
+    transition: all 0.2s;
+}
+
+.categoryCard:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.categoryIcon {
+    width: 50px;
+    height: 50px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.categoryInfo {
+    flex: 1;
+}
+
+.categoryName {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+}
+
+.categoryDesc {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0 0 0.75rem;
+}
+
+.subcategories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.subcategoryTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    background: #f0f0f0;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #666;
+}
+
+.subDelete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+}
+
+.subDelete:hover {
+    color: #ef4444;
+}
+
+.categoryActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.actionBtn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.actionBtn:hover {
+    background: #e5e5e5;
+    color: #333;
+}
+
+.actionBtn.deleteBtn:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem;
+}
+
+.inputGroup {
+    margin-bottom: 1.25rem;
+}
+
+.label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.input,
+.textarea,
+.select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fafafa;
+    transition: all 0.2s;
+    color: #000;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+    outline: none;
+    border-color: #111;
+    background: white;
+}
+
+.textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.modalActions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: 0.85rem;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.cancelBtn:hover {
+    background: #e5e5e5;
+}
+
+.submitBtn {
+    flex: 1;
+    padding: 0.85rem;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.submitBtn:hover {
+    background: #333;
+}

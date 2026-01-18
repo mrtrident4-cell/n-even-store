@@ -1,0 +1,204 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8rem 4vw 6rem;
+}
+
+.loading {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.header {
+    margin-bottom: 3rem;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profileCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+}
+
+.avatar {
+    width: 56px;
+    height: 56px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.profileInfo h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.profileInfo p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    text-align: left;
+    width: 100%;
+}
+
+.navItem span {
+    flex: 1;
+}
+
+.navItem:hover {
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+.navItem.active {
+    background: #000;
+    color: #fff;
+}
+
+.logoutBtn {
+    color: #dc2626;
+    margin-top: 1rem;
+}
+
+.logoutBtn:hover {
+    background: #fef2f2;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.card {
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    background: #fff;
+}
+
+.card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.infoItem label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.infoItem p {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.editBtn {
+    background: none;
+    border: 1px solid #000;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editBtn:hover {
+    background: #000;
+    color: #fff;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+}
+
+.emptyState p {
+    margin: 1rem 0 1.5rem;
+}
+
+.shopBtn {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .infoGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}

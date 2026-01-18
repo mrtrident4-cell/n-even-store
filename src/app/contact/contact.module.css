@@ -1,0 +1,146 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8rem 4vw 6rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.card {
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    background: #fff;
+}
+
+.icon {
+    width: 48px;
+    height: 48px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+}
+
+.card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.formSection {
+    background: #fff;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inputGroup label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    font-family: inherit;
+    font-size: 1rem;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.inputGroup textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.submitBtn {
+    background: #000;
+    color: #fff;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.submitBtn:hover {
+    background: #333;
+}
+
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+    }
+}

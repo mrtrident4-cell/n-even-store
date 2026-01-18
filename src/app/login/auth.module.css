@@ -1,0 +1,232 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--surface);
+}
+
+.card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    padding: 3rem;
+    border: 1px solid var(--border-color);
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    transition: color 0.2s;
+}
+
+.backLink:hover {
+    color: var(--text-primary);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.error {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.devOtp {
+    background: #f0fdf4;
+    color: #16a34a;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inputGroup label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.phoneInput {
+    display: flex;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.countryCode {
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    font-weight: 600;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+}
+
+.phoneInput input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    font-family: inherit;
+}
+
+.phoneInput input:focus {
+    outline: none;
+}
+
+.nameInput {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid var(--border-color);
+    padding: 0 1rem;
+}
+
+.nameInput input {
+    flex: 1;
+    padding: 0.75rem 0;
+    border: none;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.nameInput input:focus {
+    outline: none;
+}
+
+.otpInput {
+    padding: 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.5em;
+    border: 1px solid var(--border-color);
+    font-family: inherit;
+}
+
+.otpInput:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.changeBtn {
+    color: #000;
+    font-weight: 600;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.signupNote {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.submitBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #000;
+    color: #fff;
+    padding: 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background: #333;
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.resendBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0.5rem;
+}
+
+.resendBtn:hover {
+    color: #000;
+}
+
+.footer {
+    margin-top: 2rem;
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.legalLinks {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.legalLinks a {
+    color: #000;
+    text-decoration: underline;
+}

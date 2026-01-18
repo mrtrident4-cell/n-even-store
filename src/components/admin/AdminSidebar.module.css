@@ -1,0 +1,138 @@
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    background: #111;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    padding: 1.5rem 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo a {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    text-decoration: none;
+    letter-spacing: -0.03em;
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.nav {
+    flex: 1;
+    padding: 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    overflow-y: auto;
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.navItem:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.navItem.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+.arrow {
+    margin-left: auto;
+    opacity: 0.5;
+}
+
+.footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.adminInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.adminDetails {
+    flex: 1;
+}
+
+.adminName {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.adminRole {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.logoutBtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+    background: rgba(239, 68, 68, 0.2);
+}

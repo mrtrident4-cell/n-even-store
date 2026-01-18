@@ -1,0 +1,403 @@
+.container {
+    max-width: 1200px;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    transition: color 0.2s;
+}
+
+.backBtn:hover {
+    color: #111;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+/* Form Layout */
+.form {
+    width: 100%;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 1000px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mainColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sideColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e5e5e5;
+}
+
+.cardTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1.25rem;
+    color: #111;
+}
+
+/* Inputs */
+.inputGroup {
+    margin-bottom: 1.25rem;
+}
+
+.inputGroup:last-child {
+    margin-bottom: 0;
+}
+
+.label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.input,
+.textarea,
+.select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fafafa;
+    transition: all 0.2s;
+    color: #000;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+    outline: none;
+    border-color: #111;
+    background: white;
+}
+
+.textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Images */
+.imageUpload {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.addImageBtn {
+    width: 48px;
+    height: 48px;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.addImageBtn:hover {
+    background: #333;
+}
+
+.imageGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+}
+
+.imageItem {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #e5e5e5;
+}
+
+.imageItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.removeImageBtn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.primaryBadge {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    background: #111;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.imagePlaceholder {
+    grid-column: 1 / -1;
+    padding: 2rem;
+    text-align: center;
+    color: #999;
+    border: 2px dashed #e5e5e5;
+    border-radius: 10px;
+}
+
+.imagePlaceholder p {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+}
+
+/* Variants */
+.variantForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.variantForm .select,
+.variantForm .input {
+    flex: 1;
+    min-width: 120px;
+}
+
+.addVariantBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.85rem 1.25rem;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.addVariantBtn:hover {
+    background: #333;
+}
+
+.variantsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.variantItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.colorDot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #e5e5e5;
+    flex-shrink: 0;
+}
+
+.variantSize {
+    font-weight: 600;
+    min-width: 40px;
+}
+
+.variantColor {
+    flex: 1;
+    color: #666;
+}
+
+.variantStock {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.removeVariantBtn {
+    width: 24px;
+    height: 24px;
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.noVariants {
+    color: #999;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* Collections */
+.collectionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.collectionItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0;
+    cursor: pointer;
+}
+
+.collectionItem input {
+    width: 18px;
+    height: 18px;
+    accent-color: #111;
+}
+
+.noCollections {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+/* Toggle */
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.toggle:last-child {
+    margin-bottom: 0;
+}
+
+.toggle input {
+    display: none;
+}
+
+.toggleSlider {
+    width: 44px;
+    height: 24px;
+    background: #e5e5e5;
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.toggleSlider::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle input:checked+.toggleSlider {
+    background: #10b981;
+}
+
+.toggle input:checked+.toggleSlider::after {
+    transform: translateX(20px);
+}
+
+.toggleLabel {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* Submit */
+.submitBtn {
+    width: 100%;
+    padding: 1rem;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background: #333;
+    transform: translateY(-1px);
+}
+
+.submitBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

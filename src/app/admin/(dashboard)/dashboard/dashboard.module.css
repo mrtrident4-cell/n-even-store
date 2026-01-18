@@ -1,0 +1,226 @@
+.container {
+    max-width: 1400px;
+}
+
+.loading {
+    padding: 4rem;
+    text-align: center;
+    color: #666;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 0.5rem;
+}
+
+.subtitle {
+    color: #666;
+    margin: 0;
+}
+
+/* Stats Grid */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f0f0;
+}
+
+.statIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.statInfo {
+    flex: 1;
+}
+
+.statLabel {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0 0 0.25rem;
+}
+
+.statValue {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+.statBadge {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.6rem;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Content Grid */
+.contentGrid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+    .contentGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f0f0;
+}
+
+.cardTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1.25rem;
+    color: #111;
+}
+
+/* Orders List */
+.ordersList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.orderItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #fafafa;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.orderItem:hover {
+    background: #f5f5f5;
+}
+
+.orderInfo {
+    flex: 1;
+}
+
+.orderNumber {
+    font-weight: 600;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.orderDate {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0.25rem 0 0;
+}
+
+.orderStatus {
+    flex-shrink: 0;
+}
+
+.statusBadge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.orderAmount {
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* Best Sellers */
+.bestSellersList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.bestSellerItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+}
+
+.rank {
+    width: 28px;
+    height: 28px;
+    background: #111;
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.productIcon {
+    width: 40px;
+    height: 40px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.productInfo {
+    flex: 1;
+}
+
+.productName {
+    font-weight: 500;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.productSold {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0.15rem 0 0;
+}
+
+.empty {
+    color: #999;
+    text-align: center;
+    padding: 2rem;
+}

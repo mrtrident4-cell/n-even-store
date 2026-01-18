@@ -1,0 +1,55 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f5f5f7;
+    color: #111;
+}
+
+.main {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.loading {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: #f5f5f7;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e5e5e5;
+    border-top-color: #111;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Common admin styles */
+.pageHeader {
+    margin-bottom: 2rem;
+}
+
+.pageTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 0.5rem;
+}
+
+.pageSubtitle {
+    color: #666;
+    margin: 0;
+}
